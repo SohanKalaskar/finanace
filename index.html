@@ -1,11 +1,174 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Finance Tracker App</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Arial, sans-serif;
+      background: #f4f6f8;
+      margin: 0;
+      padding: 0;
+    }
+    .container {
+      max-width: 400px;
+      margin: 40px auto;
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      padding: 24px;
+    }
+    h1 {
+      text-align: center;
+      color: #2d3748;
+      margin-bottom: 16px;
+    }
+    .balance {
+      font-size: 1.5em;
+      text-align: center;
+      margin-bottom: 24px;
+      color: #38a169;
+    }
+    form {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    input, select, button {
+      padding: 8px;
+      font-size: 1em;
+      border-radius: 6px;
+      border: 1px solid #cbd5e0;
+    }
+    input[type="number"] {
+      width: 90px;
+    }
+    input[type="text"] {
+      flex: 1;
+      min-width: 100px;
+    }
+    select {
+      width: 90px;
+    }
+    button {
+      background: #3182ce;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover {
+      background: #2b6cb0;
+    }
+    .list {
+      margin-top: 10px;
+      list-style: none;
+      padding: 0;
+    }
+    .list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #e2e8f0;
+    }
+    .income { color: #38a169; }
+    .expense { color: #e53e3e; }
+    .delete-btn {
+      background: none;
+      border: none;
+      color: #e53e3e;
+      font-size: 1.1em;
+      cursor: pointer;
+    }
+    @media (max-width: 500px) {
+      .container {
+        max-width: 98vw;
+        padding: 12px;
+      }
+      form {
+        flex-direction: column;
+        gap: 6px;
+      }
+      input, select, button {
+        width: 100%;
+      }
+    }
+  </style>
 </head>
 <body>
-    Finance 
+  <div class="container">
+    <h1>Finance Tracker</h1>
+    <h2>hello world</h2>
+    <div class="balance" id="balance">$0.00</div>
+    <form id="entryForm">
+      <input type="text" id="desc" placeholder="Description" required>
+      <input type="number" id="amount" placeholder="Amount" required>
+      <select id="type">
+        <option value="income">Income</option>
+        <option value="expense">Expense</option>
+      </select>
+      <button type="submit">Add</button>
+    </form>
+    <ul class="list" id="entryList"></ul>
+  </div>
+  <script>
+    const entryForm = document.getElementById('entryForm');
+    const descInput = document.getElementById('desc');
+    const amountInput = document.getElementById('amount');
+    const typeSelect = document.getElementById('type');
+    const entryList = document.getElementById('entryList');
+    const balanceDisplay = document.getElementById('balance');
+
+    let entries = [];
+
+    function updateBalance() {
+      let balance = 0;
+      entries.forEach(e => {
+        balance += e.type === 'income' ? e.amount : -e.amount;
+      });
+      balanceDisplay.textContent = `$${balance.toFixed(2)}`;
+      balanceDisplay.style.color = balance >= 0 ? '#38a169' : '#e53e3e';
+    }
+
+    function renderEntries() {
+      entryList.innerHTML = '';
+      entries.forEach((e, i) => {
+        const li = document.createElement('li');
+        li.innerHTML = `
+          <span>${e.desc}</span>
+          <span class="${e.type}">${e.type === 'income' ? '+' : '-'}$${e.amount.toFixed(2)}</span>
+          <button class="delete-btn" onclick="deleteEntry(${i})">&times;</button>
+        `;
+        entryList.appendChild(li);
+      });
+    }
+
+    function deleteEntry(index) {
+      entries.splice(index, 1);
+      renderEntries();
+      updateBalance();
+    }
+    window.deleteEntry = deleteEntry;
+
+    entryForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const desc = descInput.value.trim();
+      const amount = parseFloat(amountInput.value);
+      const type = typeSelect.value;
+      if (!desc || isNaN(amount) || amount <= 0) return;
+      entries.push({ desc, amount, type });
+      descInput.value = '';
+      amountInput.value = '';
+      renderEntries();
+      updateBalance();
+    });
+
+    // Initial render
+    renderEntries();
+    updateBalance();
+  </script>
 </body>
 </html>
